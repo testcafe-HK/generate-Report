@@ -1,0 +1,16 @@
+{
+    "data": {
+        "labels": ["Suresh", "Sai Maddi", "Json Smith", "Saurab Gupta","Bayne Jeffery", "Yu Phoenix", "P Krishna","Elan Karthik", "Krishu Denys","Ramesh Baddam", "Elango"],
+        "datasets": [{
+            "label": "My First Dataset",
+            "data": [300, 50, 100, 150, 45, 76, 89, 90, 45,56,90],
+            "backgroundColor": ["red", "blue", "yellow", "green", "purple", "pink","orange", "light blue","grey","Silver", "light red"]
+        }]
+    },
+    "details": [
+        "Suresh Team: He has Testcafe framework and He is migrating to PlayWright",
+        "Blue: Represents the second category with 50 units.",
+        "Yellow: Represents the third category with 100 units. <a href='https://example.com' style='color:blue;'>Click here for more details.</a>",
+        "Green: Represents the fourth category with 150 units."
+    ]
+}
