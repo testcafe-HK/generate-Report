@@ -3,23 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form with API POST Call</title>
+    <title>ATT Test Execution</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #E5E4E2;
+            font-family: 'Roboto', sans-serif;
+            color: black;
+        }
+
+        h1 {
+            font-weight: 700;
+            text-align: center;
+        }
+
+        form {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+
+        label {
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        #responseDisplay {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Form with API POST Call</h1>
-    
-    <form id="myForm">
-        <label for="textbox1">Text Box 1:</label>
-        <input type="text" id="textbox1" name="textbox1" required><br><br>
+    <div>
+        <h1>Submit Your Data</h1>
         
-        <label for="textbox2">Text Box 2:</label>
-        <input type="text" id="textbox2" name="textbox2" required><br><br>
+        <form id="myForm">
+            <label for="textbox1">First Name:</label>
+            <input type="text" id="textbox1" name="textbox1" required>
+            
+            <label for="textbox2">Last Name:</label>
+            <input type="text" id="textbox2" name="textbox2" required>
 
-        <button type="submit">Submit</button>
-    </form>
+            <button type="submit">Submit</button>
+        </form>
 
-    <!-- Placeholder to display API response or loading message -->
-    <div id="responseDisplay" style="margin-top:20px;"></div>
+        <!-- Placeholder to display API response -->
+        <div id="responseDisplay"></div>
+    </div>
 
     <!-- Link to external JavaScript file -->
     <script src="script.js"></script>
