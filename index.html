@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Tech Automation Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <title>Form with API POST Call</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Claim Tech Automation Chart</h1>
-        <canvas id="myChart"></canvas>
-        <div id="details"></div>
-        <div class="total" id="total"></div>
-    </div>
+    <h1>Form with API POST Call</h1>
+    
+    <form id="myForm">
+        <label for="textbox1">Text Box 1:</label>
+        <input type="text" id="textbox1" name="textbox1" required><br><br>
+        
+        <label for="textbox2">Text Box 2:</label>
+        <input type="text" id="textbox2" name="textbox2" required><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- Link to external JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>
