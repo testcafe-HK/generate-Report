@@ -1,47 +1,43 @@
-// Fetch data from JSON file
-fetch('data.json')
-    .then(response => response.json())
-    .then(json => {
-        const data = json.data;
-        const details = json.details;
-        const total = data.datasets[0].data.reduce((acc, curr) => acc + curr, 0); // Calculate total
+document.getElementById('myForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    
+    // Get form data
+    const textbox1 = document.getElementById('textbox1').value;
+    const textbox2 = document.getElementById('textbox2').value;
 
-        const ctx = document.getElementById('myChart').getContext('2d');
+    // Prepare the data to be sent in the request body
+    const data = {
+        field1: textbox1,
+        field2: textbox2
+    };
 
-        // Create the chart
-        const myDoughnutChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: data,
-            options: {
-                onClick: (event) => {
-                    const activePoints = myDoughnutChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
-                    if (activePoints.length) {
-                        const index = activePoints[0].index;
-                        document.getElementById('details').innerHTML = details[index];
+    // Call the function to make the API request
+    submitFormData(data);
+});
 
-                        // Redirect if the clicked slice is 'Yellow'
-                        if (myDoughnutChart.data.labels[index] === 'Yellow') {
-                            window.location.href = 'https://example.com'; // Link for the dynamic slice
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                const label = tooltipItem.label || '';
-                                const value = tooltipItem.raw || 0;
-                                return `${label}: ${value}`;
-                            }
-                        }
-                    }
-                }
-            }
+async function submitFormData(data) {
+    try {
+        // Make the API POST request
+        const response = await fetch('https://example.com/api/endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer YOUR_TOKEN_HERE' // If needed
+            },
+            body: JSON.stringify(data)
         });
 
-        // Display the total in the center
-        document.getElementById('total').innerText = `Total: ${total}`;
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
+        // Check if the request was successful
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Success:', result);
+            alert('Form submitted successfully!');
+        } else {
+            console.error('Error:', response.statusText);
+            alert('Failed to submit form.');
+        }
+    } catch (error) {
+        console.error('Request failed:', error);
+        alert('Error occurred while submitting form.');
+    }
+}
