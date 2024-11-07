@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Doughnut Chart</title>
+    <title>Interactive Doughnut Chart with Manual, Automation, and Tools</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Styling remains the same */
         body {
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
@@ -72,6 +71,66 @@
             margin-top: 10px;
             text-align: center;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            text-align: right;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .label-color {
+            padding: 5px;
+            font-weight: bold;
+            margin: 5px;
+            border-radius: 5px;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -106,37 +165,88 @@
 
     <div id="message"></div>
 
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-header">Slice Data</div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content will be injected here -->
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Initialize in-memory chart data
-        const initialChartData = {
-            labels: ['Managers', 'Tests', 'Tools'],
-            datasets: [{
-                data: [30, 45, 25],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)'
-                ],
-                borderWidth: 1,
-                manualValues: [10, 15, 5],
-                automationValues: [20, 30, 10],
-                tools: ['TestCafe', 'Playwright', 'SpecFlow']
-            }]
+        // Plugin to add Manual, Automation, and Tool counts in the center of the Doughnut chart
+        const manualAutomationToolCenterTextPlugin = {
+            id: 'manualAutomationToolCenterText',
+            beforeDraw(chart) {
+                const { ctx, data } = chart;
+
+                // Sum of all manual and automation values
+                const manualTotal = data.datasets[0].manualValues.reduce((a, b) => a + b, 0);
+                const automationTotal = data.datasets[0].automationValues.reduce((a, b) => a + b, 0);
+
+                ctx.save();
+                ctx.font = 'bold 20px Arial';
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Display Manual and Automation counts in the center
+                ctx.fillText(`Manual: ${manualTotal}`, chart.width / 2, chart.height / 2 - 10);
+                ctx.fillText(`Automation: ${automationTotal}`, chart.width / 2, chart.height / 2 + 10);
+
+                ctx.restore();
+            }
         };
 
+        // Initial Doughnut chart data and setup
         const ctx = document.getElementById('myDoughnutChart').getContext('2d');
+        
+        // Function to load chart data from localStorage
+        function loadChartData() {
+            const savedData = localStorage.getItem('chartData');
+            if (savedData) {
+                return JSON.parse(savedData);
+            } else {
+                // Default data if no data is saved
+                return {
+                    labels: ['Managers', 'Tests', 'Tools'],
+                    datasets: [{
+                        data: [30, 45, 25],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1,
+                        manualValues: [10, 15, 5],  // Manual values
+                        automationValues: [20, 30, 10],  // Automation values
+                        tools: ['TestCafe', 'Playwright', 'SpecFlow']  // Tools
+                    }]
+                };
+            }
+        }
+
+        const chartData = loadChartData();
 
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
             cutout: '60%',
             plugins: {
-                legend: { position: 'top' },
+                legend: {
+                    position: 'top'
+                },
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
@@ -148,15 +258,52 @@
                         }
                     }
                 }
+            },
+            onClick: (e) => {
+                const activePoints = myDoughnutChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+                if (activePoints.length > 0) {
+                    const datasetIndex = activePoints[0].datasetIndex;
+                    const index = activePoints[0].index;
+
+                    // Get the corresponding data from the clicked slice
+                    const label = myDoughnutChart.data.labels[index];
+                    const manualValue = myDoughnutChart.data.datasets[0].manualValues[index];
+                    const automationValue = myDoughnutChart.data.datasets[0].automationValues[index];
+                    const tool = myDoughnutChart.data.datasets[0].tools[index];
+                    const backgroundColor = myDoughnutChart.data.datasets[0].backgroundColor[index];
+
+                    // Open modal and show slice data
+                    const modalBody = document.getElementById('modalBody');
+                    modalBody.innerHTML = `
+                        <div class="label-color" style="background-color: ${backgroundColor};">
+                            ${label}: ${manualValue} Manual, ${automationValue} Automation, Tool: ${tool}
+                        </div>
+                    `;
+                    openModal();
+                }
             }
         };
 
+        // Create Doughnut chart
         const myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
-            data: initialChartData,
-            options: chartOptions
+            data: chartData,
+            options: chartOptions,
+            plugins: [manualAutomationToolCenterTextPlugin]
         });
 
+        // Modal Functions
+        function openModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+
+        // Add or Update Data
         function addOrUpdateData() {
             const newLabel = document.getElementById('newLabel').value;
             const newManualValue = parseInt(document.getElementById('newManualValue').value);
@@ -165,14 +312,14 @@
             const messageDiv = document.getElementById('message');
 
             if (newLabel && newManualValue && newAutomationValue && !isNaN(newManualValue) && !isNaN(newAutomationValue)) {
+                // Check if label exists, then update or add new data
                 const index = myDoughnutChart.data.labels.indexOf(newLabel);
                 if (index > -1) {
                     // Update existing label data
                     myDoughnutChart.data.datasets[0].manualValues[index] = newManualValue;
                     myDoughnutChart.data.datasets[0].automationValues[index] = newAutomationValue;
                     myDoughnutChart.data.datasets[0].tools[index] = newTool;
-                    myDoughnutChart.data.datasets[0].data[index] = newManualValue + newAutomationValue;
-                    messageDiv.textContent = `Updated label: "${newLabel}"`;
+                    messageDiv.textContent = `Updated label: "${newLabel}" with Manual: ${newManualValue}, Automation: ${newAutomationValue}, Tool: ${newTool}.`;
                 } else {
                     // Add new label
                     myDoughnutChart.data.labels.push(newLabel);
@@ -186,10 +333,13 @@
                     myDoughnutChart.data.datasets[0].backgroundColor.push(randomColor);
                     myDoughnutChart.data.datasets[0].borderColor.push(randomColor.replace('0.6', '1'));
 
-                    messageDiv.textContent = `Added new label: "${newLabel}"`;
+                    messageDiv.textContent = `Added new label: "${newLabel}" with Manual: ${newManualValue}, Automation: ${newAutomationValue}, Tool: ${newTool}.`;
                 }
 
-                // Update the chart to reflect changes
+                // Save updated data to localStorage
+                localStorage.setItem('chartData', JSON.stringify(myDoughnutChart.data));
+
+                // Update the chart
                 myDoughnutChart.update();
             } else {
                 messageDiv.textContent = "Please enter valid data for Label, Manual, and Automation.";
