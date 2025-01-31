@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Test Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px; }
+        .chart-container { width: 250px; height: 250px; position: relative; }
+        .chart-container span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .description { text-align: left; width: 60%; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; }
+        th { background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+    <h2>Claim Tech Nightly Test Result</h2>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="testChart"></canvas>
+            <span id="totalTests">220</span>
+        </div>
+        <div class="description">
+            <h3>Project Description</h3>
+            <p>This project aims to automate the testing process and provide insights into test results, ensuring software quality and reliability.</p>
+        </div>
+    </div>
+    
+    <table>
+        <tr>
+            <th>Manager</th>
+            <th>Total</th>
+            <th>Passed</th>
+            <th>Failed</th>
+            <th>Pipeline Link</th>
+        </tr>
+        <tr>
+            <td>Suresh Vasan</td>
+            <td>100</td>
+            <td>80</td>
+            <td>15</td>
+            <td><a href="#">View Pipeline</a></td>
+        </tr>
+        <tr>
+            <td>Ramesh Baddam</td>
+            <td>120</td>
+            <td>90</td>
+            <td>25</td>
+            <td><a href="#">View Pipeline</a></td>
+        </tr>
+		
+		<tr>
+            <td>Brian Moore</td>
+            <td>120</td>
+            <td>90</td>
+            <td>25</td>
+            <td><a href="#">View Pipeline</a></td>
+        </tr>
+    </table>
+    
+    <script>
+        Chart.register(ChartDataLabels);
+        const totalTests = 220;
+        const ctx = document.getElementById('testChart').getContext('2d');
+        const testChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passed', 'Failed', 'Skipped'],
+                datasets: [{
+                    data: [170, 40, 10], // Example Data
+                    backgroundColor: ['#4CAF50', '#FF5733', '#FFC107']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    datalabels: {
+                        color: '#fff',
+                        anchor: 'end',
+                        align: 'start',
+                        font: { weight: 'bold', size: 14 },
+                        formatter: (value) => value
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
