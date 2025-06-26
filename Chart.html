@@ -1,102 +1,299 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Software Test Results</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .container { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px; }
-        .chart-container { width: 250px; height: 250px; position: relative; }
-        .chart-container span {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .description { text-align: left; width: 60%; }
-        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #ddd; }
-        th { background-color: #4CAF50; color: white; }
-    </style>
-</head>
-<body>
-    <h2>Claim Tech Nightly Test Result</h2>
-    <div class="container">
-        <div class="chart-container">
-            <canvas id="testChart"></canvas>
-            <span id="totalTests">220</span>
-        </div>
-        <div class="description">
-            <h3>Project Description</h3>
-            <p>This project aims to automate the testing process and provide insights into test results, ensuring software quality and reliability.</p>
-        </div>
-    </div>
+name: ATT CDPC Containerized Tests
+
+# Trigger configuration
+trigger:
+  branches:
+    include:
+    - main
+    - develop
+  paths:
+    exclude:
+    - README.md
+    - docs/*
+
+# PR trigger
+pr:
+  branches:
+    include:
+    - main
+    - develop
+
+# Scheduled triggers for smoke tests
+schedules:
+- cron: "0 2 * * *"
+  displayName: Daily smoke tests
+  branches:
+    include:
+    - main
+  always: true
+
+# Pipeline variables
+variables:
+  # Variable groups for credentials and configuration
+  - group: ATT-CDPC-Test-Credentials
+  - group: ATT-CDPC-Test-Config
+  
+  # Default test configuration
+  # DEFAULT_TEST_TYPE: 'all'
+ # DEFAULT_ENVIRONMENT: 'UT1'
+  
+  # Docker configuration
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  
+  # Agent configuration
+  vmImageName: 'ubuntu-latest'
+
+# Parameters for manual runs
+parameters:
+- name: testType
+  displayName: 'Test Type'
+  type: string
+  default: 'all'
+  values:
+  - all
+  - ui
+  - api
+
+- name: environment
+  displayName: 'Test Environment'
+  type: string
+  default: 'UT1'
+  values:
+  - UT1
+  - TR1
+  - FSTR
+  - PD1
+
+- name: testTag
+  displayName: 'Test Tag (optional)'
+  type: string
+  default: ''
+
+- name: runSmokeTests
+  displayName: 'Run Smoke Tests Only'
+  type: boolean
+  default: false
+
+stages:
+- stage: Build
+  displayName: 'Build Test Containers'
+  jobs:
+  - job: BuildContainers
+    displayName: 'Build Docker Images'
+    pool:
+      vmImage: $(vmImageName)
     
-    <table>
-        <tr>
-            <th>Manager</th>
-            <th>Total</th>
-            <th>Passed</th>
-            <th>Failed</th>
-            <th>Pipeline Link</th>
-        </tr>
-        <tr>
-            <td>Suresh Vasan</td>
-            <td>100</td>
-            <td>80</td>
-            <td>15</td>
-            <td><a href="#">View Pipeline</a></td>
-        </tr>
-        <tr>
-            <td>Ramesh Baddam</td>
-            <td>120</td>
-            <td>90</td>
-            <td>25</td>
-            <td><a href="#">View Pipeline</a></td>
-        </tr>
-		
-		<tr>
-            <td>Brian Moore</td>
-            <td>120</td>
-            <td>90</td>
-            <td>25</td>
-            <td><a href="#">View Pipeline</a></td>
-        </tr>
-    </table>
+    steps:
+    - checkout: self
+      displayName: 'Checkout source code'
     
-    <script>
-        Chart.register(ChartDataLabels);
-        const totalTests = 220;
-        const ctx = document.getElementById('testChart').getContext('2d');
-        const testChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Passed', 'Failed', 'Skipped'],
-                datasets: [{
-                    data: [170, 40, 10], // Example Data
-                    backgroundColor: ['#4CAF50', '#FF5733', '#FFC107']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    datalabels: {
-                        color: '#fff',
-                        anchor: 'end',
-                        align: 'start',
-                        font: { weight: 'bold', size: 14 },
-                        formatter: (value) => value
-                    }
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+    - task: DockerCompose@0
+      displayName: 'Build UI Test Container'
+      inputs:
+        action: 'Build services'
+        dockerComposeFile: 'docker-compose.yml'
+        serviceName: 'testcafe-ui-e2e'
+        dockerComposeFileArgs: |
+          DOCKER_BUILDKIT=1
+    
+    - task: DockerCompose@0
+      displayName: 'Build API Test Container'
+      inputs:
+        action: 'Build services'
+        dockerComposeFile: 'docker-compose.yml'
+        serviceName: 'specflow-api-e2e'
+        dockerComposeFileArgs: |
+          DOCKER_BUILDKIT=1
+    
+    # Save built images for later stages
+    - script: |
+        docker save $(docker-compose config --services | xargs -I {} echo "att-cdpc-test_{}" | tr '\n' ' ') | gzip > test-images.tar.gz
+      displayName: 'Save Docker images'
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'test-images.tar.gz'
+        artifact: 'test-images'
+      displayName: 'Publish Docker images'
+
+- stage: UITests
+  displayName: 'UI E2E Tests'
+  dependsOn: Build
+  condition: or(eq('${{ parameters.testType }}', 'all'), eq('${{ parameters.testType }}', 'ui'))
+  jobs:
+  - job: RunUITests
+    displayName: 'TestCafe UI Tests'
+    pool:
+      vmImage: $(vmImageName)
+    strategy:
+      matrix:
+        ${{ if eq(parameters.runSmokeTests, true) }}:
+          UT1_Smoke:
+            TEST_ENV: 'UT1'
+            TEST_TAG: '@smoke'
+          TR1_Smoke:
+            TEST_ENV: 'TR1'
+            TEST_TAG: '@TR1'
+          FSTR_Smoke:
+            TEST_ENV: 'FSTR'
+            TEST_TAG: '@FSTR'
+        ${{ if eq(parameters.runSmokeTests, false) }}:
+          TestRun:
+            TEST_ENV: '${{ parameters.environment }}'
+            TEST_TAG: '${{ parameters.testTag }}'
+    
+    steps:
+    - checkout: self
+      displayName: 'Checkout source code'
+    
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifactName: 'test-images'
+        targetPath: '$(Pipeline.Workspace)'
+      displayName: 'Download Docker images'
+    
+    - script: |
+        docker load < $(Pipeline.Workspace)/test-images.tar.gz
+      displayName: 'Load Docker images'
+    
+    - script: |
+        # Build test command
+        CMD="npm run test:e2e -- --env=$(TEST_ENV)"
+        
+        if [ -n "$(TEST_TAG)" ]; then
+          CMD="$CMD --tag=$(TEST_TAG)"
+        fi
+        
+        if [ -n "$(TEST_USERNAME)" ]; then
+          CMD="$CMD --u='$(TEST_USERNAME)'"
+        fi
+        
+        if [ -n "$(TEST_PASSWORD)" ]; then
+          CMD="$CMD --p='$(TEST_PASSWORD)'"
+        fi
+        
+        echo "Running command: $CMD"
+        
+        # Run UI tests
+        docker-compose run --rm \
+          -e TESTCAFE_BROWSER="chrome:headless" \
+          -e NODE_ENV=test \
+          testcafe-ui-e2e \
+          sh -c "$CMD"
+      displayName: 'Run UI Tests'
+      env:
+        TEST_USERNAME: $(TEST_USERNAME)
+        TEST_PASSWORD: $(TEST_PASSWORD)
+      continueOnError: true
+    
+    - script: |
+        docker-compose run --rm testcafe-ui-e2e npm run report
+      displayName: 'Generate UI test reports'
+      condition: always()
+    
+    - task: PublishHtmlReport@1
+      inputs:
+        reportDir: 'Testcafe-UI-E2E/report'
+        tabName: 'UI Test Report - $(TEST_ENV)'
+      displayName: 'Publish UI test report'
+      condition: always()
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'Testcafe-UI-E2E/report'
+        artifact: 'ui-test-report-$(TEST_ENV)'
+      displayName: 'Publish UI test report artifacts'
+      condition: always()
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'Testcafe-UI-E2E/_uploads_'
+        artifact: 'ui-test-screenshots-$(TEST_ENV)'
+      displayName: 'Publish test screenshots and videos'
+      condition: always()
+
+- stage: SmokeTests
+  displayName: 'Smoke Tests'
+  dependsOn: Build
+  condition: eq(variables['Build.Reason'], 'Schedule')
+  jobs:
+  - job: RunSmokeTests
+    displayName: 'Multi-Environment Smoke Tests'
+    pool:
+      vmImage: $(vmImageName)
+    strategy:
+      matrix:
+        UT1:
+          TEST_ENV: 'UT1'
+          TEST_TAG: '@smoke'
+        TR1:
+          TEST_ENV: 'TR1'
+          TEST_TAG: '@TR1'
+        FSTR:
+          TEST_ENV: 'FSTR'
+          TEST_TAG: '@FSTR'
+    
+    steps:
+    - checkout: self
+      displayName: 'Checkout source code'
+    
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifactName: 'test-images'
+        targetPath: '$(Pipeline.Workspace)'
+      displayName: 'Download Docker images'
+    
+    - script: |
+        docker load < $(Pipeline.Workspace)/test-images.tar.gz
+      displayName: 'Load Docker images'
+    
+    - script: |
+        CMD="npm run test:e2e -- --env=$(TEST_ENV) --tag=$(TEST_TAG)"
+        
+        if [ -n "$(TEST_USERNAME)" ]; then
+          CMD="$CMD --u='$(TEST_USERNAME)'"
+        fi
+        
+        if [ -n "$(TEST_PASSWORD)" ]; then
+          CMD="$CMD --p='$(TEST_PASSWORD)'"
+        fi
+        
+        docker-compose run --rm \
+          -e TESTCAFE_BROWSER="chrome:headless" \
+          testcafe-ui-e2e \
+          sh -c "$CMD"
+      displayName: 'Run $(TEST_ENV) Smoke Tests'
+      env:
+        TEST_USERNAME: $(SMOKE_TEST_USERNAME)
+        TEST_PASSWORD: $(SMOKE_TEST_PASSWORD)
+      continueOnError: true
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'Testcafe-UI-E2E/report'
+        artifact: 'smoke-test-results-$(TEST_ENV)'
+      displayName: 'Publish smoke test results'
+      condition: always()
+
+- stage: Cleanup
+  displayName: 'Cleanup Resources'
+  dependsOn: 
+  - APITests
+  - UITests
+  - SmokeTests
+  condition: always()
+  jobs:
+  - job: CleanupDocker
+    displayName: 'Docker Cleanup'
+    pool:
+      vmImage: $(vmImageName)
+    
+    steps:
+    - script: |
+        # Cleanup any remaining containers and images
+        docker-compose down --remove-orphans --volumes || true
+        docker system prune -f || true
+        docker volume prune -f || true
+      displayName: 'Cleanup Docker resources'
+      continueOnError: true 
