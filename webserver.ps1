@@ -1,3 +1,18 @@
+Hi Greg,
+
+Our team is responsible for creating bulk claims for the Operations Training team, which we currently handle through the UI.
+
+To improve efficiency and automation, I’m planning to transition this process to use APIs instead of the UI. My setup is already working successfully in DV1, but I need a Client ID for TR1 to proceed with the implementation in that environment.
+
+Could you please provide an existing Client ID for TR1, or help provision a new one?
+
+Appreciate your support!
+
+Best regards,
+Harish Kumar
+
+
+
 # Simple HTTP server to serve HTML and execute batch file with parameters
 $listener = [System.Net.HttpListener]::new()
 $listener.Prefixes.Add("http://localhost:8080/")
