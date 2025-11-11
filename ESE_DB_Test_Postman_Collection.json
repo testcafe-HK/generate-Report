@@ -1,0 +1,295 @@
+{
+  "info": {
+    "name": "ESE Database Test Suite \u2013 Parameterized Queries",
+    "_postman_id": "c5c1d2e2-9a60-4dc8-9a2b-ese-postman-20251111144034",
+    "description": "Run parameterized SQL validations for ESE schema via a generic SQL proxy. Update environment variables before running.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Build JDBC string for SQL Server",
+          "const host = pm.environment.get('host') || pm.collectionVariables.get('host');",
+          "const port = pm.environment.get('port') || pm.collectionVariables.get('port') || '1433';",
+          "const dbName = pm.environment.get('dbName') || pm.collectionVariables.get('dbName');",
+          "const username = pm.environment.get('username') || pm.collectionVariables.get('username');",
+          "const password = pm.environment.get('password') || pm.collectionVariables.get('password');",
+          "const jdbc = `jdbc:sqlserver://${host}:${port};databaseName=${dbName};user=${username};password=${password};encrypt=true;trustServerCertificate=true;`;",
+          "pm.collectionVariables.set('jdbc', jdbc);",
+          "pm.collectionVariables.set('driver', 'mssql');"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": "localhost"
+    },
+    {
+      "key": "port",
+      "value": "1433"
+    },
+    {
+      "key": "dbName",
+      "value": "ESE_DB"
+    },
+    {
+      "key": "username",
+      "value": "sa"
+    },
+    {
+      "key": "password",
+      "value": "YourStrong!Passw0rd"
+    },
+    {
+      "key": "db_proxy_url",
+      "value": "https://your-sql-proxy.example.com/query"
+    },
+    {
+      "key": "keyId",
+      "value": "1"
+    },
+    {
+      "key": "locationName",
+      "value": "Detroit"
+    },
+    {
+      "key": "sysId",
+      "value": "SYS-001"
+    },
+    {
+      "key": "routeName",
+      "value": "Route-A"
+    },
+    {
+      "key": "opid",
+      "value": "42"
+    },
+    {
+      "key": "days",
+      "value": "7"
+    }
+  ],
+  "item": [
+    {
+      "name": "Apps: Lookup by KeyId",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{db_proxy_url}}",
+          "host": [
+            "{{db_proxy_url}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"driver\": \"{{driver}}\",\n  \"jdbc\": \"{{jdbc}}\",\n  \"query\": \"SELECT * FROM dbo.Apps WHERE KeyId = :keyId;\",\n  \"params\": {\n    \"keyId\": \"{{keyId}}\"\n  }\n}"
+        },
+        "description": "Apps: Lookup by KeyId"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('At least 1 row returned', function () { pm.expect(json.rowCount || (json.rows || []).length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Device: Validate Location Exists in Dict_Location (JOIN)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{db_proxy_url}}",
+          "host": [
+            "{{db_proxy_url}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"driver\": \"{{driver}}\",\n  \"jdbc\": \"{{jdbc}}\",\n  \"query\": \"SELECT d.DeviceID, d.Location, l.Name AS LocationName FROM dbo.Device d JOIN dbo.Dict_Location l ON d.Location = l.Name WHERE d.Location = :locationName;\",\n  \"params\": {\n    \"locationName\": \"{{locationName}}\"\n  }\n}"
+        },
+        "description": "Device: Validate Location Exists in Dict_Location (JOIN)"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('At least 1 row returned', function () { pm.expect(json.rowCount || (json.rows || []).length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TicketLocation: FK to AssignmentGroup (Mismatches Only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{db_proxy_url}}",
+          "host": [
+            "{{db_proxy_url}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"driver\": \"{{driver}}\",\n  \"jdbc\": \"{{jdbc}}\",\n  \"query\": \"SELECT t.SysID FROM dbo.Dict_TicketLocation t LEFT JOIN dbo.Dict_TicketLocation_AssignmentGroup a ON t.SysID = a.AssignmentGroupSysID WHERE a.AssignmentGroupSysID IS NULL;\",\n  \"params\": {}\n}"
+        },
+        "description": "TicketLocation: FK to AssignmentGroup (Mismatches Only)"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Zero rows (no mismatches)', function () { pm.expect(json.rowCount || (json.rows || []).length).to.eql(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GembaRoute: Validate Route Exists",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{db_proxy_url}}",
+          "host": [
+            "{{db_proxy_url}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"driver\": \"{{driver}}\",\n  \"jdbc\": \"{{jdbc}}\",\n  \"query\": \"SELECT * FROM dbo.GembaRoute WHERE Route = :routeName;\",\n  \"params\": {\n    \"routeName\": \"{{routeName}}\"\n  }\n}"
+        },
+        "description": "GembaRoute: Validate Route Exists"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('At least 1 row returned', function () { pm.expect(json.rowCount || (json.rows || []).length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "PortalLogger: Recent Events for Operator",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{db_proxy_url}}",
+          "host": [
+            "{{db_proxy_url}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"driver\": \"{{driver}}\",\n  \"jdbc\": \"{{jdbc}}\",\n  \"query\": \"SELECT * FROM dbo.PortalLogger WHERE OPID = :opid AND DTStamp > DATEADD(DAY, -:days, GETDATE());\",\n  \"params\": {\n    \"opid\": \"{{opid}}\",\n    \"days\": \"{{days}}\"\n  }\n}"
+        },
+        "description": "PortalLogger: Recent Events for Operator"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('At least 1 row returned', function () { pm.expect(json.rowCount || (json.rows || []).length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "SafetyAudit: Location Name Must Exist",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{db_proxy_url}}",
+          "host": [
+            "{{db_proxy_url}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"driver\": \"{{driver}}\",\n  \"jdbc\": \"{{jdbc}}\",\n  \"query\": \"SELECT s.NAME FROM dbo.SafetyAudit s JOIN dbo.Dict_Location l ON s.NAME = l.Name WHERE s.NAME = :locationName;\",\n  \"params\": {\n    \"locationName\": \"{{locationName}}\"\n  }\n}"
+        },
+        "description": "SafetyAudit: Location Name Must Exist"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('At least 1 row returned', function () { pm.expect(json.rowCount || (json.rows || []).length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
