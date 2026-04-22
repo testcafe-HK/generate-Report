@@ -30,6 +30,31 @@ concat(
   '</tr>'
 )
 
+Convert the input text into HTML rows only.
+
+Return only one or more <tr>...</tr> blocks.
+Do not return <table>, <thead>, <tbody>, <th>, or any explanation.
+
+Each <tr> must contain exactly:
+1. <td>Incident ID</td>
+2. <td><span>Status badge</span></td>
+3. <td>Details</td>
+
+Extraction rules:
+- Incident ID starts with "INC" or "SCTASK"
+- Details is the text before "Status -"
+- Status is the text after "Status -"
+- Replace "Investigating" with "In Progress"
+- Remove trailing "|" and extra spaces
+
+Status badge colors:
+- Open = #d9534f
+- In Progress = #d4a017
+- Resolved = #2e9e44
+
+Use inline CSS for all styling.
+Return valid HTML only.
+
 
 concat(
   '<table style="width:100%; border-collapse:collapse; font-family:Arial, sans-serif; font-size:16px;">',
