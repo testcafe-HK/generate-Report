@@ -18,7 +18,32 @@
     <script src="script.js"></script>
 </body>
 </html>
+concat(
+  '<tr>',
+    '<td style="padding:12px; border-bottom:1px solid #e5e5e5;">', item()?['IncidentId'], '</td>',
+    '<td style="padding:12px; border-bottom:1px solid #e5e5e5;">',
+      '<span style="background-color:#d4a017; color:white; padding:6px 14px; border-radius:16px; font-weight:bold;">',
+        if(equals(item()?['Status'],'Investigating'),'In Progress',item()?['Status']),
+      '</span>',
+    '</td>',
+    '<td style="padding:12px; border-bottom:1px solid #e5e5e5;">', item()?['Description'], '</td>',
+  '</tr>'
+)
 
+
+concat(
+  '<table style="width:100%; border-collapse:collapse; font-family:Arial, sans-serif; font-size:16px;">',
+    '<tr style="background-color:#0b5ed7; color:white;">',
+      '<th style="padding:12px; text-align:left;">Incident ID</th>',
+      '<th style="padding:12px; text-align:left;">Status</th>',
+      '<th style="padding:12px; text-align:left;">Details</th>',
+    '</tr>',
+    join(
+      select(first(body('Run_a_prompt')), item()?['RowHtml']),
+      ''
+    ),
+  '</table>'
+)
 
 
 Extract incident records from the input text.
