@@ -18,3 +18,31 @@
     <script src="script.js"></script>
 </body>
 </html>
+
+
+
+Extract incident records from the input text.
+
+For each incident, return:
+- IncidentId
+- Description
+- Status
+
+Rules:
+- Output must be valid JSON only.
+- Do not add markdown, code fences, comments, or explanations.
+- Return a JSON array.
+- "IncidentId" should contain values like INC1539472.
+- "Description" should contain the text between the incident id and the status separator.
+- "Status" should contain the status text only, such as Investigating.
+- Trim extra spaces and remove trailing "|" characters.
+- If a field is missing, return an empty string for that field.
+
+Expected output format:
+[
+  {
+    "IncidentId": "INC1539472",
+    "Description": "Rover printing issues at Riverside lab sites after upgrade",
+    "Status": "Investigating"
+  }
+]
