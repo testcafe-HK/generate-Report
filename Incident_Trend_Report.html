@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Incident Trend Report</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    color: #111827;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 25px;
+}
+
+.header {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.header p {
+    margin-top: 8px;
+    opacity: 0.9;
+}
+
+.cards {
+    display: flex;
+    gap: 18px;
+    margin: 24px 0;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    border-left: 6px solid #2563eb;
+}
+
+.card h3 {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.card .number {
+    font-size: 34px;
+    font-weight: 800;
+    margin-top: 8px;
+    color: #1e3a8a;
+}
+
+.section {
+    background: white;
+    padding: 24px;
+    border-radius: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.section h2 {
+    margin-top: 0;
+    color: #1e293b;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+.chart-box {
+    height: 350px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+th {
+    background: #1e3a8a;
+    color: white;
+    padding: 13px;
+    text-align: left;
+    font-size: 14px;
+}
+
+td {
+    padding: 13px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+tr:hover {
+    background: #eef2ff;
+}
+
+.incident-badge {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.count-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.footer {
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>Incident Trend Report</h1>
+        <p>Last 5 TXT files scanned from Zoom folder</p>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Total Incidents</h3>
+            <div class="number">16</div>
+        </div>
+        <div class="card">
+            <h3>Current Week Incidents</h3>
+            <div class="number">5</div>
+        </div>
+        <div class="card">
+            <h3>Files Scanned</h3>
+            <div class="number">5</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Incident Trend Graph</h2>
+        <div class="chart-box">
+            <canvas id="incidentTrendChart"></canvas>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Current Week Incidents - IncidentID_3.txt</h2>
+        <table>
+            <tr>
+                <th>Incident ID</th>
+                <th>Description</th>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547877</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database</td>
+            </tr>        </table>
+    </div>
+
+    <div class="section">
+        <h2>Incident Count Summary - Last 5 Files</h2>
+        <table>
+            <tr>
+                <th>File Name</th>
+                <th>Total Incident IDs</th>
+            </tr>            <tr>
+                <td>IncidentID_3.txt</td>
+                <td><span class="count-badge">5</span></td>
+            </tr>            <tr>
+                <td>IncidentID_1.txt</td>
+                <td><span class="count-badge">3</span></td>
+            </tr>            <tr>
+                <td>IncidentID_6.txt</td>
+                <td><span class="count-badge">4</span></td>
+            </tr>            <tr>
+                <td>IncidentID_1 - Copy (2).txt</td>
+                <td><span class="count-badge">2</span></td>
+            </tr>            <tr>
+                <td>IncidentID_4.txt</td>
+                <td><span class="count-badge">2</span></td>
+            </tr>        </table>
+    </div>
+
+    <div class="footer">
+        Report generated automatically from TXT incident files.
+    </div>
+
+</div>
+
+<script>
+const ctx = document.getElementById('incidentTrendChart');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['IncidentID_3.txt','IncidentID_1.txt','IncidentID_6.txt','IncidentID_1 - Copy (2).txt','IncidentID_4.txt'],
+        datasets: [{
+            label: 'Total Incident IDs',
+            data: [5,3,4,2,2],
+            borderWidth: 3,
+            tension: 0.35,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>
