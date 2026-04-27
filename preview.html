@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Incident Trend Report</title>
+
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    color: #111827;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 25px;
+}
+
+.header {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    color: white;
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.header p {
+    margin-top: 8px;
+    opacity: 0.9;
+}
+
+.cards {
+    display: flex;
+    gap: 18px;
+    margin: 24px 0;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    border-left: 6px solid #2563eb;
+}
+
+.card h3 {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.card .number {
+    font-size: 34px;
+    font-weight: 800;
+    margin-top: 8px;
+    color: #1e3a8a;
+}
+
+.section {
+    background: white;
+    padding: 24px;
+    border-radius: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.section h2 {
+    margin-top: 0;
+    color: #1e293b;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+.chart-box {
+    height: 350px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+th {
+    background: #1e3a8a;
+    color: white;
+    padding: 13px;
+    text-align: left;
+    font-size: 14px;
+}
+
+td {
+    padding: 13px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+tr:hover {
+    background: #eef2ff;
+}
+
+.incident-badge {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.count-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.footer {
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>Incident Trend Report</h1>
+        <p>Last 5 TXT files scanned from Zoom folder</p>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Total Incidents</h3>
+            <div class="number">16</div>
+        </div>
+        <div class="card">
+            <h3>Current Week Incidents</h3>
+            <div class="number">5</div>
+        </div>
+        <div class="card">
+            <h3>Files Scanned</h3>
+            <div class="number">5</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Incident Trend Graph</h2>
+        <div class="chart-box" style="height:auto; text-align:center;">
+            <img src="https://quickchart.io/chart?width=900&height=350&format=png&c=%7B%22type%22%3A%22line%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22IncidentID_3.txt%22%2C%22IncidentID_1.txt%22%2C%22IncidentID_6.txt%22%2C%22IncidentID_1%20-%20Copy%20%282%29.txt%22%2C%22IncidentID_4.txt%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Total%20Incident%20IDs%22%2C%22data%22%3A%5B5%2C3%2C4%2C2%2C2%5D%2C%22borderColor%22%3A%22%232563eb%22%2C%22backgroundColor%22%3A%22rgba%2837%2C99%2C235%2C0.15%29%22%2C%22fill%22%3Atrue%2C%22tension%22%3A0.35%7D%5D%7D%2C%22options%22%3A%7B%22plugins%22%3A%7B%22legend%22%3A%7B%22display%22%3Atrue%7D%7D%2C%22scales%22%3A%7B%22y%22%3A%7B%22beginAtZero%22%3Atrue%2C%22ticks%22%3A%7B%22precision%22%3A0%7D%7D%7D%7D%7D" alt="Incident Trend Chart" style="width:100%; max-width:900px; height:auto; border-radius:12px; display:block; margin:0 auto;" />
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Current Week Incidents - IncidentID_3.txt</h2>
+        <table>
+            <tr>
+                <th>Incident ID</th>
+                <th>Description</th>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547877</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database
+
+INS12345667        Created Riverside accounts</td>
+            </tr>            <tr>
+                <td><span class="incident-badge">INC76547889</span></td>
+                <td>Add all nurse IDs on database</td>
+            </tr>        </table>
+    </div>
+
+    <div class="section">
+        <h2>Incident Count Summary - Last 5 Files</h2>
+        <table>
+            <tr>
+                <th>File Name</th>
+                <th>Total Incident IDs</th>
+            </tr>            <tr>
+                <td>IncidentID_3.txt</td>
+                <td><span class="count-badge">5</span></td>
+            </tr>            <tr>
+                <td>IncidentID_1.txt</td>
+                <td><span class="count-badge">3</span></td>
+            </tr>            <tr>
+                <td>IncidentID_6.txt</td>
+                <td><span class="count-badge">4</span></td>
+            </tr>            <tr>
+                <td>IncidentID_1 - Copy (2).txt</td>
+                <td><span class="count-badge">2</span></td>
+            </tr>            <tr>
+                <td>IncidentID_4.txt</td>
+                <td><span class="count-badge">2</span></td>
+            </tr>        </table>
+    </div>
+
+    <div class="footer">
+        Report generated automatically from TXT incident files.
+    </div>
+
+</div>
+
+
+</body>
+</html>
