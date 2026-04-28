@@ -12,6 +12,54 @@ Best regards,
 Harish Kumar
 
 
+You are given text from the last 5 weekly incident files.
+
+Extract all incident records from the input and create a complete HTML incident trend report.
+
+Extraction rules:
+1. Find every Incident ID that starts with "INC".
+2. The description is the text after the Incident ID until the next Incident ID or end of that file section.
+3. Remove extra spaces, line breaks, duplicate separators, and trailing symbols.
+4. Keep the file/week name if provided.
+5. Count total Incident IDs per file/week.
+6. Identify the latest/current week file as the first or most recent file in the input.
+
+HTML report rules:
+1. Return ONLY valid HTML.
+2. Do not include markdown, code fences, or explanations.
+3. Use inline CSS only.
+4. Create a report with:
+   - Title: Incident Trend Report
+   - Summary cards:
+     - Total Incidents
+     - Current Week Incidents
+     - Files Scanned
+   - Incident Trend Graph section
+   - Current Week Incidents table
+   - Incident Count Summary table for last 5 files
+5. The Current Week Incidents table must have:
+   - Incident ID
+   - Description
+6. Incident IDs should appear as rounded badges.
+7. Use a clean modern dashboard style:
+   - light background
+   - white cards
+   - blue header
+   - rounded sections
+   - subtle borders
+8. Do not use JavaScript.
+9. Do not use Chart.js or canvas.
+10. For the graph section, create an Outlook-safe chart image using QuickChart:
+    <img src="https://quickchart.io/chart?c=ENCODED_CHART_CONFIG" />
+11. The chart must show file/week names as labels and incident counts as data.
+12. The report must look similar to a professional incident dashboard.
+
+Return the final HTML only.
+
+
+
+
+
 
 # Simple HTTP server to serve HTML and execute batch file with parameters
 $listener = [System.Net.HttpListener]::new()
