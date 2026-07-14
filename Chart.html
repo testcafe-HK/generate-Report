@@ -1,4 +1,8 @@
+Remove-Item .\hostkey.txt -ErrorAction SilentlyContinue
 
+ssh-keyscan -T 10 -p 22 transfer.ohiohealth.com 2>$null |
+    Where-Object { $_ -match '^[^#].*\s(ssh-rsa|ssh-ed25519|ecdsa-sha2-)\s' } |
+    Out-File -FilePath .\hostkey.txt -Encoding ascii
 "<div style='
     font-family:Segoe UI, Arial, sans-serif;
     color:#172B4D;
